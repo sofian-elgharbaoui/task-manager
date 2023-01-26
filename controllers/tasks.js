@@ -1,28 +1,82 @@
-// const path = require("path");
-const Task = require("../models/tasks");
-const getTasks = (req, res) => {
+const task = require("../models/tasks");
+
+const getTasks = async (req, res) => {
+  try {
+    // to get all json files inside an array
+    const allTasks = await task.find({});
+    res.json(allTasks);
+  } catch (error) {
+    res.json(error);
+  }
+  // // METHOD 01
+  // find all tasks with name "task 1", then give me "the completed"
+  // will return an array with all the matchced objects
+  // task.find({ name: "task 1" },"completed", (err, tasks) => {
+  //   if (err) res.json(err);
+  //   res.json(tasks);
+  // });
+
+  // // METHOD 02 - preferd
+  // try {
+  //   const tasks = await task.find({ name: "task 1" }, "completed");
+  //   res.json(tasks);
+  // } catch (err) {
+  //   res.json(err);
+  // }
+
+  // // METHOD 03
+  // let tasks = task.find({ name: "task 2" }, "completed");
+
+  // tasks.exec((err, tasks) => {
+  //   if (err) res.json(err);
+  //   res.json(tasks);
+  // });
+
   //   res.sendFile(path.resolve(__dirname, "../public/index.html")); // the point is neccessary before slash
   //   fs.readFile("../public/index.html", "utf8", (err, data) => {
   //     if (err) console.log(err.message);
   //     // // I had to put the return keywork here to send the code outsite the fs.readfile()
   //     return res.send(data);
   //   });
-  res.send("get all tasks");
 };
 
-const getSingleTask = (req, res) => {
-  res.json(req.params);
+const getSingleTask = async (req, res) => {
+  try {
+    let { id: taskID } = req.params;
+    let specificTask = await task.findById(taskID);
+    // When it comes to find (with any method of finding) and you insert an id with the same structure or
+    // length of the id, but with wrong value the, the promise'll return null.
+    // Then we have to do sth rather than returning null
+    if (!specificTask) {
+      return res.json({ msg: `the id (${taskID}) doesn't match any task` });
+    }
+    res.json(specificTask);
+  } catch (error) {
+    res.send("The id is not correct");
+  }
 };
 
 const createTask = async (req, res) => {
-  await Task.create(req.body);
-  // res.send(req.body);
-  //   res.json("new task has been created");
+  try {
+    await task.create(req.body); // push the task to the db
+    res.json(req.body);
+    // res.json("new task has been created");
+  } catch (error) {
+    // the error represents an obj with some pairs.
+    res.send(error.errors.name.message);
+  }
 };
 
-const updateTask = (req, res) => {
-  res.json(+req.params.id);
-  // res.send("edit on a task");
+const updateTask = async (req, res) => {
+  try {
+    let { id: taskID } = req.params;
+    let updatedTask = await task.findByIdAndUpdate(taskID, {
+      name: req.body.name,
+    });
+    res.send(updatedTask);
+  } catch (error) {
+    res.json(error);
+  }
 };
 
 const deleteTask = (req, res) => {
