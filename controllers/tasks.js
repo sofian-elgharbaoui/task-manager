@@ -47,9 +47,9 @@ const getSingleTask = async (req, res) => {
     // When it comes to find (with any method of finding) and you insert an id with the same structure or
     // length of the id, but with wrong value the, the promise'll return null.
     // Then we have to do sth rather than returning null
-    if (!specificTask) {
+    if (!specificTask)
       return res.json({ msg: `the id (${taskID}) doesn't match any task` });
-    }
+
     res.json(specificTask);
   } catch (error) {
     res.send("The id is not correct");
@@ -60,9 +60,7 @@ const createTask = async (req, res) => {
   try {
     await task.create(req.body); // push the task to the db
     res.json(req.body);
-    // res.json("new task has been created");
   } catch (error) {
-    // the error represents an obj with some pairs.
     res.send(error.errors.name.message);
   }
 };
@@ -70,18 +68,31 @@ const createTask = async (req, res) => {
 const updateTask = async (req, res) => {
   try {
     let { id: taskID } = req.params;
-    let updatedTask = await task.findByIdAndUpdate(taskID, {
-      name: req.body.name,
+    const { name, completed } = req.body;
+    const updatedTask = await task.findByIdAndUpdate(taskID, req.body, {
+      // I passed the full obj to it because if I want to make an object
+      // with the intended keys to be updated & their values, it'll be the same.
+      new: true,
+      runValidators: true,
     });
-    res.send(updatedTask);
+    if (!updatedTask)
+      return res.send(`there is no task with this id: ${taskID}`);
+    res.json(updatedTask);
   } catch (error) {
-    res.json(error);
+    res.send("The id is not correct");
   }
 };
 
-const deleteTask = (req, res) => {
-  res.json(+req.params.id);
-  //   res.send("the task was deleted successfuly");
+const deleteTask = async (req, res) => {
+  const { id: taskID } = req.params;
+  try {
+    const deletedTask = await task.findByIdAndDelete(taskID);
+    if (!deletedTask)
+      return res.json({ msg: `there is no task with this id: ${taskID}` });
+    res.json(deletedTask);
+  } catch (error) {
+    res.json({ msg: `This id (${taskID}) is not correct` });
+  }
 };
 
 module.exports = {

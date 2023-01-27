@@ -1,11 +1,13 @@
 const express = require("express");
 const app = express();
 
-// connect to db
+// // connect to db
 const connectDB = require("./db/connect");
+
+// // bring the secret vars
 require("dotenv").config();
 
-// bring routes
+// // bring routes
 const tasksRoute = require("./routes/tasks");
 
 // // For parsing application/json
@@ -21,7 +23,7 @@ app.use(express.static("./public"));
 app.use("/api/v1/tasks", tasksRoute);
 
 const port = 3000;
-// connect to MongoDB
+// // connect to MongoDB
 (async () => {
   try {
     await connectDB(process.env.uri); // this is a promise of the connection
