@@ -8,20 +8,24 @@ const tasksDOM = document.querySelector(".tasks");
 const showTasks = async () => {
   loadingDOM.style.visibility = "visible";
   try {
-    const { data: tasks } = await axios.get("/api/v1/tasks");
-    if (tasks.length < 1) {
+    const {
+      data: {
+        data: { allTasks: tasksArr },
+      },
+    } = await axios.get("/api/v1/tasks");
+    if (tasksArr.length < 1) {
       tasksDOM.innerHTML = '<h5 class="empty-list">No tasks in your list</h5>';
       loadingDOM.style.visibility = "hidden";
       return;
     }
-    const allTasks = tasks
+    const allTasks = tasksArr
       .map((task) => {
         const { completed, _id: taskID, name } = task;
-        console.log(taskID);
         return `
           <div class="single-task ${completed && "task-completed"}">
             <h5><span><i class="far fa-check-circle"></i></span>${name}</h5>
             <div class="task-links">
+
               <!-- edit link -->
               <a href="task.html?id=${taskID}" class="edit-link">
                 <i class="fas fa-edit"></i>
@@ -67,7 +71,7 @@ formDOM.addEventListener("submit", async (e) => {
   const name = taskInputDOM.value;
 
   try {
-    await axios.post("/api/v1/tasks", { name });
+    await axios.post("/api/v1/tasks", { name }); // send an obj with the name key and it's value {name : "klqsjd"}
     showTasks();
     taskInputDOM.value = "";
     formAlertDOM.style.display = "block";

@@ -7,6 +7,8 @@ const connectDB = require("./db/connect");
 // // bring the secret vars
 require("dotenv").config();
 
+const notFound = require("./middlewares/not-found");
+
 // // bring routes
 const tasksRoute = require("./routes/tasks");
 
@@ -21,6 +23,9 @@ app.use(express.static("./public"));
 
 // // this the Routes rout - mention the method has used here
 app.use("/api/v1/tasks", tasksRoute);
+
+// // for the 404 status
+app.use(notFound);
 
 const port = 3000;
 // // connect to MongoDB

@@ -384,10 +384,13 @@ form > :last-child {
   gap: 0 0.5rem;
 }
 .delete-btn,
-.edit-link i {
+.edit-link {
   background: transparent;
   font-size: 0.75rem;
   border: transparent;
+}
+.delete-btn i,
+.edit-link i {
   cursor: pointer;
 }
 .edit-link {
