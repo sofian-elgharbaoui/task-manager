@@ -20,7 +20,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.static("./public"));
 
 // // this the Routes rout - mention the method has used here
-app.use("/task-manager/api/v1/tasks", tasksRoute);
+app.use("/api/v1/tasks", tasksRoute);
 
 const port = 3000;
 // // connect to MongoDB
