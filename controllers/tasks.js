@@ -1,6 +1,8 @@
 const Task = require("../models/tasks");
 const asyncWrapper = require("../middlewares/async");
 
+const { createError } = require("../errors/custom-error");
+
 const getTasks = asyncWrapper(async (req, res) => {
   const allTasks = await Task.find({});
   res.json({
@@ -39,14 +41,15 @@ const getTasks = asyncWrapper(async (req, res) => {
 //     return res.send(data);
 //   });
 
-const getSingleTask = asyncWrapper(async (req, res) => {
+const getSingleTask = asyncWrapper(async (req, res, next) => {
   let { id: taskID } = req.params;
   let specificTask = await Task.findById(taskID);
   // When it comes to find (with any method of finding) and you insert an id with the same structure or
   // length of the id, but with wrong value, the promise'll return null.
   // Then we have to do sth rather than returning null.
-  if (!specificTask)
-    return res.json({ msg: `the id (${taskID}) doesn't match any task` });
+  if (!specificTask) {
+    return next(createError(`the id (${taskID}) doesn't match any task`, 404));
+  }
   res.json(specificTask);
 });
 
@@ -55,7 +58,7 @@ const createTask = asyncWrapper(async (req, res) => {
   res.json(task);
 });
 
-const updateTask = asyncWrapper(async (req, res) => {
+const updateTask = asyncWrapper(async (req, res, next) => {
   let { id: taskID } = req.params;
   const { name, completed } = req.body;
   const updatedTask = await Task.findByIdAndUpdate(taskID, req.body, {
@@ -64,15 +67,18 @@ const updateTask = asyncWrapper(async (req, res) => {
     new: true,
     runValidators: true,
   });
-  if (!updatedTask) return res.send(`there is no task with this id: ${taskID}`);
+  if (!updatedTask)
+    return next(createError(`the id (${taskID}) doesn't match any task`, 404));
+
   res.json(updatedTask);
 });
 
-const deleteTask = asyncWrapper(async (req, res) => {
+const deleteTask = asyncWrapper(async (req, res, next) => {
   const { id: taskID } = req.params;
   const deletedTask = await Task.findByIdAndDelete(taskID);
   if (!deletedTask)
-    return res.json({ msg: `there is no task with this id: ${taskID}` });
+    return next(createError(`the id (${taskID}) doesn't match any task`, 404));
+
   res.json(deletedTask);
 });
 
