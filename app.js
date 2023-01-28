@@ -9,6 +9,9 @@ require("dotenv").config();
 
 const notFound = require("./middlewares/not-found");
 
+// I create the error handler to do what I WANT; instead of sending the built-in error middleware in the res
+const errorHandler = require("./middlewares/error-handler");
+
 // // bring routes
 const tasksRoute = require("./routes/tasks");
 
@@ -24,8 +27,11 @@ app.use(express.static("./public"));
 // // this the Routes rout - mention the method has used here
 app.use("/api/v1/tasks", tasksRoute);
 
-// // for the 404 status
+// // For the 404 page. I MUST put this middleware after I put all the pages that I have.
 app.use(notFound);
+
+// // I have to define error-handling middleware last, after other app.use() and routes calls
+app.use(errorHandler);
 
 const port = 3000;
 // // connect to MongoDB
