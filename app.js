@@ -33,7 +33,9 @@ app.use(notFound);
 // // I have to define error-handling middleware last, after other app.use() and routes calls
 app.use(errorHandler);
 
+// //use this command: set PORT=6000
 const port = process.env.PORT || 3000;
+
 // // connect to MongoDB
 (async () => {
   try {
