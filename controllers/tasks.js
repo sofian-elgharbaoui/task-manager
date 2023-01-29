@@ -60,8 +60,8 @@ const createTask = asyncWrapper(async (req, res) => {
 
 const updateTask = asyncWrapper(async (req, res, next) => {
   let { id: taskID } = req.params;
-  const { name, completed } = req.body;
-  const updatedTask = await Task.findByIdAndUpdate(taskID, req.body, {
+  const newInfo = req.body;
+  const updatedTask = await Task.findByIdAndUpdate(taskID, newInfo, {
     // I passed the full obj to it because if I want to make an object
     // with the intended keys to be updated & their values, it'll be the same.
     new: true,
